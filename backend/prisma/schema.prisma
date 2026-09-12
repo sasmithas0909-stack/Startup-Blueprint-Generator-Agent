@@ -1,0 +1,99 @@
+// ============================================================
+// DATABASE SCHEMA — Startup Blueprint Generator
+// AICTE Problem Statement 20
+// ============================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// -------------------------------------------------------
+// User — authenticated accounts
+// -------------------------------------------------------
+model User {
+  id           String      @id @default(uuid())
+  email        String      @unique
+  name         String
+  passwordHash String
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  blueprints   Blueprint[]
+  startupIdeas StartupIdea[]
+}
+
+// -------------------------------------------------------
+// StartupIdea — form submission from user
+// -------------------------------------------------------
+model StartupIdea {
+  id              String    @id @default(uuid())
+  userId          String
+  startupName     String
+  idea            String
+  industry        String
+  targetLocation  String
+  targetCustomer  String
+  initialBudget   String
+  teamSize        Int
+  stage           String    // ideation | validation | mvp | growth | scaling
+  additionalNotes String?
+  createdAt       DateTime  @default(now())
+
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  blueprint Blueprint?
+}
+
+// -------------------------------------------------------
+// Blueprint — generated startup blueprint
+// -------------------------------------------------------
+model Blueprint {
+  id            String    @id @default(uuid())
+  userId        String
+  startupIdeaId String    @unique
+  status        String    @default("pending") // pending | generating | completed | failed
+  errorMessage  String?
+  stepProgress  String?   // JSON serialized record of 11 workflow steps and their statuses
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  user        User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  startupIdea StartupIdea        @relation(fields: [startupIdeaId], references: [id], onDelete: Cascade)
+  sections    BlueprintSection[]
+  sources     Source[]
+}
+
+// -------------------------------------------------------
+// BlueprintSection — each analysed/generated section
+// -------------------------------------------------------
+model BlueprintSection {
+  id          String   @id @default(uuid())
+  blueprintId String
+  sectionKey  String   // problem | solution | usp | customers | market | competitors | bmc | revenue | budget | gtm | schemes | funding | legal | executive_summary
+  title       String
+  content     String   // JSON serialised
+  generatedAt DateTime @default(now())
+
+  blueprint Blueprint @relation(fields: [blueprintId], references: [id], onDelete: Cascade)
+
+  @@unique([blueprintId, sectionKey])
+}
+
+// -------------------------------------------------------
+// Source — RAG-retrieved sources / references
+// -------------------------------------------------------
+model Source {
+  id          String   @id @default(uuid())
+  blueprintId String
+  title       String
+  url         String?
+  category    String   // schemes | funding | legal | market | policy
+  snippet     String?
+  retrievedAt DateTime @default(now())
+
+  blueprint Blueprint @relation(fields: [blueprintId], references: [id], onDelete: Cascade)
+}

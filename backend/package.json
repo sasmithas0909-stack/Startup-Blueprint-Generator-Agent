@@ -1,0 +1,40 @@
+{
+  "name": "startup-blueprint-backend",
+  "version": "1.0.0",
+  "description": "Backend for Startup Blueprint Generator Agent - AICTE Problem Statement 20",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev --name init",
+    "db:push": "prisma db push",
+    "db:studio": "prisma studio",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --config jest.config.js",
+    "test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --config jest.config.js --watch"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.10.2",
+    "@tavily/core": "^0.7.11",
+    "bcryptjs": "^2.4.3",
+    "chromadb": "^1.8.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.18.3",
+    "express-rate-limit": "^7.2.0",
+    "express-validator": "^7.0.1",
+    "helmet": "^7.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "morgan": "^1.10.0",
+    "node-fetch": "^3.3.2",
+    "uuid": "^9.0.1",
+    "winston": "^3.12.0"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "nodemon": "^3.1.0",
+    "prisma": "^5.10.2",
+    "supertest": "^7.0.0"
+  }
+}
